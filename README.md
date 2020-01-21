@@ -29,12 +29,14 @@ redis-server redis.conf
 In a new terminal activate the environment and then start the worker with
 
 ```bash
+source .venv/bin/activate
 rq worker
 ```
 
 In yet another terminal, activate the environment and then start the app that submits the jobs using
 
 ```bash
+source .venv/bin/activate
 python -u app.py
 ```
 
