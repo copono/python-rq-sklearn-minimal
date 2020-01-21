@@ -6,7 +6,7 @@ import sys
 
 # settings
 wait_seconds = 5
-default_site = 'http://nvie.com'
+sites = ['http://wikipedia.org', 'http://helloworld.org/']
 
 # Tell RQ what Redis connection to use
 redis_conn = Redis()
@@ -15,12 +15,12 @@ q = Queue(connection=redis_conn)  # no args implies the default queue
 # set the sites to count words on
 if len(sys.argv) > 1:
     sites = sys.argv[1:]
-else:
-    sites = [default_site]
+
+# submit the jobs
+jobs = [q.enqueue(count_words_at_url, site) for site in sites]
 
 print(f'Checking the number of words on {", ".join(sites)}')
 print("Immediately:")
-jobs = [q.enqueue(count_words_at_url, site) for site in sites]
 # check the result before they are complete
 for job in jobs:
     print(job.result)   # => None
