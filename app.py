@@ -1,32 +1,32 @@
 from rq import Queue
 from redis import Redis
-from countwords import count_words_at_url
-import time
-import sys
-
+import time, sys
+from model import get_data, predict, to_target_names
+import numpy as np
 # settings
-wait_seconds = 5
-sites = ['http://wikipedia.org', 'http://helloworld.org/']
+wait_seconds = 3
 
 # Tell RQ what Redis connection to use
 redis_conn = Redis()
 q = Queue(connection=redis_conn)  # no args implies the default queue
 
-# set the sites to count words on
-if len(sys.argv) > 1:
-    sites = sys.argv[1:]
+# Take the input from the user or the test dataset.
+if len(sys.argv)==5:
+    X_predict = [[float(i) for i in sys.argv[1:]]]
+else:
+    _, X_test, _, y_test = get_data()
+    X_predict = X_test[:3]
 
-# submit the jobs
-jobs = [q.enqueue(count_words_at_url, site) for site in sites]
+# submit the job
+job = q.enqueue(predict, X_predict)
 
-print(f'Checking the number of words on {", ".join(sites)}')
-print("Immediately:")
+print('Predicting on:')
+print(X_predict)
+print('Checking the job immediately we get:')
 # check the result before they are complete
-for job in jobs:
-    print(job.result)   # => None
+print(to_target_names(job.result))   # => None
 
 # Now, wait a while, until the worker is finished and check again
-print(f"After waiting for {wait_seconds} seconds:")
+print(f"After waiting for {wait_seconds} seconds we get:")
 time.sleep(wait_seconds)
-for job in jobs:
-    print(job.result)   # => 337 or something 
+print(to_target_names(job.result))    # => [0, 1, 2] or something
