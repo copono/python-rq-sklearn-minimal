@@ -1,8 +1,10 @@
-# python-rq minimal app
+# python-rq-sklearn minimal app
 
-Minimal app using redis pub/sub. Based on the rq site example [here](https://python-rq.org/docs/).
+Minimal app using redis queues. Similar to the example in the rq site [here](https://python-rq.org/docs/), but using with a machine learning model as the job.
 
-This app sends a redis queue job to the worker, which counts the words in a website. The app prints the result of the jobs immediately after the job submissions, which should result in `none` as output. Then it waits five seconds and prints the result after the worker has finished the job.
+This app predicts the iris species using a random forest classifier model trained on the [iris flower dataset](https://en.wikipedia.org/wiki/Iris_flower_data_set). The four input features are the sepal length, the sepal width, the petal length and the petal width.
+
+The app uses redis queues to send the prediction jobs to a worker process. After submiting the job, it prints the result immediately, which should result in `None` as output. Then it waits five seconds and prints the result after the worker has finished the job.
 
 ## Setup
 
@@ -26,29 +28,28 @@ First run the redis server using
 redis-server redis.conf
 ```
 
-In a new terminal activate the environment and then start the worker with
+In a new terminal activate the environment and then start the worker. This also trains the model that will be used in all predictions.
 
 ```bash
 source .venv/bin/activate
-rq worker
+python worker.py
 ```
 
-In yet another terminal, activate the environment and then start the app that submits the jobs using
+In yet another terminal, activate the environment and then start the app to submit the jobs
 
 ```bash
 source .venv/bin/activate
 python -u app.py
 ```
 
-Pass extra arguments to check the number of words in those sites. Otherwise default websites are used. For example:
+Pass four extra arguments to use as input in the model. Otherwise input values from the dataset are used. For example:
 
 ```bash
-(.venv)$ python -u app.py http://wikipedia.org https://stackoverflow.com
-Checking the number of words on http://wikipedia.org, https://stackoverflow.com
+(.venv)$ python app.py .1 .2 .3 .4
+Predicting on:
+[[0.1, 0.2, 0.3, 0.4]]
 Immediately:
 None
-None
-After waiting for 5 seconds:
-3547
-7437
+After waiting for 3 seconds:
+setosa
 ```
