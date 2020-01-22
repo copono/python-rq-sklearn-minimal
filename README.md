@@ -4,7 +4,7 @@ Minimal app using redis queues. Similar to the example in the rq site [here](htt
 
 This app predicts the iris species using a random forest classifier model trained on the [iris flower dataset](https://en.wikipedia.org/wiki/Iris_flower_data_set). The four input features are the sepal length, the sepal width, the petal length and the petal width.
 
-The app uses redis queues to send the prediction jobs to a worker process. After submiting the job, it prints the result immediately, which should result in `None` as output. Then it waits five seconds and prints the result after the worker has finished the job.
+The app uses redis queues to send the prediction jobs to a worker process. After submiting the job, it prints the result immediately, which should result in `None` as output. Then it waits some seconds and prints the result after the worker has finished the job.
 
 ## Setup
 
